@@ -37,4 +37,4 @@ jobs:
           remote_port: ${{ secrets.PORT }}
           remote_key: ${{ secrets.KEY }}
           remote_path: ${{ secrets.TARGET }}
-          path: out/
+          path: dist/
