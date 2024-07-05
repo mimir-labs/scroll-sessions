@@ -27,7 +27,7 @@ function Item({ rank, address, marks }: { rank: string | number; address: Addres
         {addressEq(account, address) ? 'You' : <AddressComponent address={address} />}
       </p>
       <h4 className='font-bold sm:font-[900] text-[14px] sm:text-[30px]'>{Number(marks).toFixed(2)}</h4>
-      <Link href={`https://safe.mimir.global?chainId=534352&address=${address}`} target='_blank' rel='noreferrer'>
+      <Link href={`https://safe.mimir.global?chainid=534352&address=${address}`} target='_blank' rel='noreferrer'>
         <svg
           xmlns='http://www.w3.org/2000/svg'
           width='26'
@@ -53,7 +53,7 @@ function Leaderboard() {
   const { data } = useQuery<{ address: Address; marks: string }[]>({
     queryKey: [`${serviceUrl}leaderboard`]
   });
-  const { data: rankData } = useQuery<{ isMultisig: boolean; address: Address; marks: string; rank: string }>({
+  const { data: rankData } = useQuery<{ is_multisig: boolean; address: Address; marks: string; rank: string }>({
     queryHash: `${serviceUrl}rank/${address}`,
     queryKey: [address ? `${serviceUrl}rank/${address}` : null]
   });
@@ -71,12 +71,12 @@ function Leaderboard() {
 
   return (
     <>
-      {is600 && rankData && rankData.isMultisig && (
+      {is600 && rankData && rankData.is_multisig && (
         <div className='fixed top-[40%] left-[calc(50%+360px)] flex items-center gap-2.5 p-2.5 py-5 rounded-[20px] bg-white'>
           <span className='font-extrabold text-[20px]'>Your Rank</span>
           <b className='font-[900] text-[30px]'>{rankData.rank}</b>
           <Link
-            href={`https://safe.mimir.global?chainId=534352&address=${rankData.address}`}
+            href={`https://safe.mimir.global?chainid=534352&address=${rankData.address}`}
             target='_blank'
             rel='noreferrer'
           >
@@ -124,8 +124,15 @@ function Leaderboard() {
             >
               <AddressIcon address={data?.[1].address} size={leading2Size} />
             </div>
-            <div className='z-20 absolute bottom-[7%] text-center leading-none'>
-              <h6 className='font-[900] text-[12px] sm:text-[20px]'>{Number(data?.[1].marks).toFixed(0)}</h6>
+            <div
+              className='z-20 absolute bottom-[7%] text-center leading-none'
+              onClick={
+                data?.[1]
+                  ? () => window.open(`https://safe.mimir.global?chainid=534352&address=${data?.[1].address}`)
+                  : undefined
+              }
+            >
+              <h6 className='font-[800] text-[12px] sm:text-[20px]'>{Number(data?.[1].marks).toFixed(0)}</h6>
               <p className='mt-0 sm:mt-[5px] text-[10px] sm:text-[14px] opacity-50'>
                 <AddressComponent address={data?.[1].address} />
               </p>
@@ -136,8 +143,15 @@ function Leaderboard() {
             <div className='z-10 absolute transition-transform hover:scale-110 cursor-pointer'>
               <AddressIcon address={data?.[0].address} size={leading1Size} />
             </div>
-            <div className='z-20 absolute bottom-[12%] text-center leading-none'>
-              <h6 className='font-[900] text-[12px] sm:text-[30px]'>{Number(data?.[0].marks).toFixed(0)}</h6>
+            <div
+              className='z-20 absolute bottom-[12%] text-center leading-none'
+              onClick={
+                data?.[0]
+                  ? () => window.open(`https://safe.mimir.global?chainid=534352&address=${data?.[0].address}`)
+                  : undefined
+              }
+            >
+              <h6 className='font-[800] text-[12px] sm:text-[30px]'>{Number(data?.[0].marks).toFixed(0)}</h6>
               <p className='mt-0 sm:mt-[5px] text-[10px] sm:text-[17px] opacity-50'>
                 <AddressComponent address={data?.[0].address} />
               </p>
@@ -151,8 +165,15 @@ function Leaderboard() {
             >
               <AddressIcon address={data?.[2].address} size={leading2Size} />
             </div>
-            <div className='z-20 absolute bottom-[7%] text-center leading-none'>
-              <h6 className='font-[900] text-[12px] sm:text-[20px]'>{Number(data?.[2].marks).toFixed(0)}</h6>
+            <div
+              className='z-20 absolute bottom-[7%] text-center leading-none'
+              onClick={
+                data?.[2]
+                  ? () => window.open(`https://safe.mimir.global?chainid=534352&address=${data?.[2].address}`)
+                  : undefined
+              }
+            >
+              <h6 className='font-[800] text-[12px] sm:text-[20px]'>{Number(data?.[2].marks).toFixed(0)}</h6>
               <p className='mt-0 sm:mt-[5px] text-[10px] sm:text-[14px] opacity-50'>
                 <AddressComponent address={data?.[2].address} />
               </p>
@@ -162,7 +183,7 @@ function Leaderboard() {
 
         <Card className='mt-[20px] sm:mt-[30px]'>
           <CardBody className='space-y-2.5 sm:space-y-5'>
-            {!is600 && rankData && rankData.isMultisig && (
+            {!is600 && rankData && rankData.is_multisig && (
               <>
                 <Item
                   key={`my-${rankData.address}`}
