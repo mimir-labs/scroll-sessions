@@ -54,7 +54,8 @@ function Leaderboard() {
     queryKey: [`${serviceUrl}leaderboard`]
   });
   const { data: rankData } = useQuery<{ isMultisig: boolean; address: Address; marks: string; rank: string }>({
-    queryKey: [`${serviceUrl}rank/${address}`]
+    queryHash: `${serviceUrl}rank/${address}`,
+    queryKey: [address ? `${serviceUrl}rank/${address}` : null]
   });
 
   const is600 = useMediaQuery('(min-width: 600px)');
