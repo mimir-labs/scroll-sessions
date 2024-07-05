@@ -7,5 +7,6 @@ export * from './useInput';
 export * from './useInputAddress';
 export * from './useInputNumber';
 export * from './useMediaQuery';
+export * from './useQueryParams';
 export * from './useStore';
 export * from './useToken';

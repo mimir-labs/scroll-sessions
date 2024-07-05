@@ -3,30 +3,40 @@
 
 import { Card, CardBody, Divider, Link } from '@nextui-org/react';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { Address } from 'viem';
 import { useAccount } from 'wagmi';
 
 import ScrollIcon from '@mimir-wallet/assets/images/scroll.svg';
 import { Address as AddressComponent, AddressIcon } from '@mimir-wallet/components';
 import { serviceUrl } from '@mimir-wallet/config';
-import { useMediaQuery } from '@mimir-wallet/hooks';
+import { useMediaQuery, useQueryParam } from '@mimir-wallet/hooks';
 import { addressEq } from '@mimir-wallet/utils';
 
-function Item({ rank, address, marks }: { rank: string | number; address: Address; marks: string }) {
+function Item({
+  rank,
+  address,
+  marks,
+  account
+}: {
+  rank: string | number;
+  address: Address;
+  marks: string;
+  account?: string;
+}) {
   const is600 = useMediaQuery('(min-width: 600px)');
-  const { address: account } = useAccount();
 
   return (
     <div
       key={address}
       className='px-2.5 sm:px-5 py-2.5 flex items-center gap-2.5 sm:gap-5 rounded-[10px] sm:rounded-[20px] bg-[#FFF1DE]'
     >
-      <h4 className='font-bold sm:font-[900] text-[14px] sm:text-[30px]'>{Number(rank) < 10 ? `0${rank}` : rank}</h4>
+      <h4 className='font-bold sm:font-[800] text-[14px] sm:text-[30px]'>{Number(rank) < 10 ? `0${rank}` : rank}</h4>
       <AddressIcon address={address} size={is600 ? 40 : 20} />
       <p className='flex-1 font-bold sm:font-[800] text-[14px] sm:text-[20px]'>
         {addressEq(account, address) ? 'You' : <AddressComponent address={address} />}
       </p>
-      <h4 className='font-bold sm:font-[900] text-[14px] sm:text-[30px]'>{Number(marks).toFixed(2)}</h4>
+      <h4 className='font-bold sm:font-[800] text-[14px] sm:text-[30px]'>{Number(marks).toFixed(2)}</h4>
       <Link href={`https://safe.mimir.global?chainid=534352&address=${address}`} target='_blank' rel='noreferrer'>
         <svg
           xmlns='http://www.w3.org/2000/svg'
@@ -49,14 +59,22 @@ function Item({ rank, address, marks }: { rank: string | number; address: Addres
 }
 
 function Leaderboard() {
-  const { address } = useAccount();
+  const [addressUrl, setAddressUrl] = useQueryParam<string>('address');
+  const { address: account } = useAccount();
   const { data } = useQuery<{ address: Address; marks: string }[]>({
     queryKey: [`${serviceUrl}leaderboard`]
   });
+
   const { data: rankData } = useQuery<{ is_multisig: boolean; address: Address; marks: string; rank: string }>({
-    queryHash: `${serviceUrl}rank/${address}`,
-    queryKey: [address ? `${serviceUrl}rank/${address}` : null]
+    queryHash: `${serviceUrl}rank/${addressUrl}`,
+    queryKey: [addressUrl ? `${serviceUrl}rank/${addressUrl}` : null]
   });
+
+  useEffect(() => {
+    if (account) {
+      setAddressUrl(account, { replace: true });
+    }
+  }, [account, setAddressUrl]);
 
   const is600 = useMediaQuery('(min-width: 600px)');
   const is500 = useMediaQuery('(min-width: 500px)');
@@ -72,7 +90,7 @@ function Leaderboard() {
   return (
     <>
       {is600 && rankData && rankData.is_multisig && (
-        <div className='fixed top-[40%] left-[calc(50%+360px)] flex items-center gap-2.5 p-2.5 py-5 rounded-[20px] bg-white'>
+        <div className='z-50 fixed top-[40%] left-[calc(50%+360px)] flex items-center gap-2.5 p-2.5 py-5 rounded-[20px] bg-white'>
           <span className='font-extrabold text-[20px]'>Your Rank</span>
           <b className='font-[900] text-[30px]'>{rankData.rank}</b>
           <Link
@@ -121,17 +139,15 @@ function Leaderboard() {
             <div
               className='z-10 absolute transition-transform hover:scale-110 cursor-pointer'
               style={{ marginTop: leading2Mt }}
-            >
-              <AddressIcon address={data?.[1].address} size={leading2Size} />
-            </div>
-            <div
-              className='z-20 absolute bottom-[7%] text-center leading-none'
               onClick={
                 data?.[1]
                   ? () => window.open(`https://safe.mimir.global?chainid=534352&address=${data?.[1].address}`)
                   : undefined
               }
             >
+              <AddressIcon address={data?.[1].address} size={leading2Size} />
+            </div>
+            <div className='z-20 absolute bottom-[7%] text-center leading-none'>
               <h6 className='font-[800] text-[12px] sm:text-[20px]'>{Number(data?.[1].marks).toFixed(0)}</h6>
               <p className='mt-0 sm:mt-[5px] text-[10px] sm:text-[14px] opacity-50'>
                 <AddressComponent address={data?.[1].address} />
@@ -140,17 +156,17 @@ function Leaderboard() {
           </div>
           <div className='relative flex items-center justify-center'>
             <img className='z-0' src='/images/leading-1.svg' alt='leading 1' />
-            <div className='z-10 absolute transition-transform hover:scale-110 cursor-pointer'>
-              <AddressIcon address={data?.[0].address} size={leading1Size} />
-            </div>
             <div
-              className='z-20 absolute bottom-[12%] text-center leading-none'
+              className='z-10 absolute transition-transform hover:scale-110 cursor-pointer'
               onClick={
                 data?.[0]
                   ? () => window.open(`https://safe.mimir.global?chainid=534352&address=${data?.[0].address}`)
                   : undefined
               }
             >
+              <AddressIcon address={data?.[0].address} size={leading1Size} />
+            </div>
+            <div className='z-20 absolute bottom-[12%] text-center leading-none'>
               <h6 className='font-[800] text-[12px] sm:text-[30px]'>{Number(data?.[0].marks).toFixed(0)}</h6>
               <p className='mt-0 sm:mt-[5px] text-[10px] sm:text-[17px] opacity-50'>
                 <AddressComponent address={data?.[0].address} />
@@ -162,17 +178,15 @@ function Leaderboard() {
             <div
               className='z-10 absolute transition-transform hover:scale-110 cursor-pointer'
               style={{ marginTop: leading3Mt, marginLeft: 1 }}
-            >
-              <AddressIcon address={data?.[2].address} size={leading2Size} />
-            </div>
-            <div
-              className='z-20 absolute bottom-[7%] text-center leading-none'
               onClick={
                 data?.[2]
                   ? () => window.open(`https://safe.mimir.global?chainid=534352&address=${data?.[2].address}`)
                   : undefined
               }
             >
+              <AddressIcon address={data?.[2].address} size={leading2Size} />
+            </div>
+            <div className='z-20 absolute bottom-[7%] text-center leading-none'>
               <h6 className='font-[800] text-[12px] sm:text-[20px]'>{Number(data?.[2].marks).toFixed(0)}</h6>
               <p className='mt-0 sm:mt-[5px] text-[10px] sm:text-[14px] opacity-50'>
                 <AddressComponent address={data?.[2].address} />
@@ -190,6 +204,7 @@ function Leaderboard() {
                   address={rankData.address}
                   marks={rankData.marks}
                   rank={rankData.rank}
+                  account={addressUrl}
                 />
                 <Divider />
               </>
@@ -197,7 +212,7 @@ function Leaderboard() {
             {data
               ?.slice(3)
               ?.map(({ address, marks }, index) => (
-                <Item key={address} address={address} marks={marks} rank={index + 3 + 1} />
+                <Item key={address} address={address} marks={marks} rank={index + 3 + 1} account={addressUrl} />
               ))}
           </CardBody>
         </Card>
