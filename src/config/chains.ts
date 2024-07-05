@@ -33,6 +33,7 @@ export function initMimirConfig(): Config {
     appName: 'Leaderboard(Scroll)',
     projectId: WALLET_CONNECT_PROJECT_ID,
     chains: supportedChains,
-    syncConnectedChain: true
+    syncConnectedChain: true,
+    appIcon: 'https://safe.mimir.global/images/logo-circle.png'
   });
 }
