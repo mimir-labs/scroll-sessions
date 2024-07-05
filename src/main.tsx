@@ -6,8 +6,8 @@ import './index.css';
 import dayjs from 'dayjs';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { registerSW } from 'virtual:pwa-register';
 
+// import { registerSW } from 'virtual:pwa-register';
 import Providers from './providers/providers';
 import App from './App';
 import { initMimirConfig } from './config';
@@ -34,8 +34,4 @@ if (container) {
       </Providers>
     </BrowserRouter>
   );
-}
-
-if (process.env.NODE_ENV === 'production') {
-  registerSW();
 }
